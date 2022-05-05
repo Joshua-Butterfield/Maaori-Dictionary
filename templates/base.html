@@ -13,7 +13,11 @@
 
 		<header>
 			<h1>{% block heading %}Māori Dictionary{% endblock %}</h1>
-            <li><a href="\signup">signup</a></li>
+            {% if logged_in %}
+                <li><a href="\logout">logout</a></li>
+            {% else %}
+                <li><a href="\login">login</a></li>
+            {% endif %}
 		</header>
 
 		<nav>
@@ -23,8 +27,9 @@
 			<span></span>
 			<ul>
                 <li><a href="\">Home</a></li>
-                <li><a href="\categories">Categories</a></li>
-
+				{% for i in categories_list %}
+					<li><a href="\categories">{{ i[0] }}</a></li>
+				{% endfor %}
 			</ul>
 		</nav>
 

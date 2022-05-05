@@ -5,6 +5,7 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime
 
 DATABASE = "C:/Users/18016/OneDrive - Wellington College/Maori Dictionary/dictionary.db"
+#DATABASE = r"C:/Users/Joshua Butterfield/OneDrive - Wellington College/Maori Dictionary/dictionary.db"
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "banana"
@@ -39,7 +40,26 @@ def is_logged_in():
 
 @app.route('/')
 def render_homepage():
-    return render_template('home.html', logged_in=is_logged_in())
+    if request.method == 'POST':
+        cat_name = request.form.get('cat_name').strip().lower()
+        con = create_connection(DATABASE)
+        print("hello")
+        query = "INSERT INTO categories(cat_name) VALUES(?)"
+        cur = con.cursor()
+        cur.execute(query, (cat_name))
+        category = cur.fetchall()
+        con.commit()
+        con.close()
+    if request.method == 'GET':
+        query = "SELECT cat_name FROM categories"
+        con = create_connection(DATABASE)
+        cur = con.cursor()
+        cur.execute(query, ())
+        category = cur.fetchall()
+        con.commit()
+        con.close()
+    return render_template('home.html', categories_list=category, logged_in=is_logged_in())
+    #return render_template('home.html', logged_in=is_logged_in())
 
 
 @app.route('/signup', methods=['Get', 'Post'])
@@ -67,6 +87,7 @@ def render_signup():
         cur = con.cursor()
         try:
             cur.execute(query, (first_name, surname, email, hashed_password))
+            print(first_name, surname, email, hashed_password)
         except sqlite3.IntegrityError:
             return redirect('/signup?error=Email+is+already+used')
 
@@ -109,9 +130,22 @@ def render_login_page():
         session['customer_id'] = user_id
         session['fname'] = first_name
         session['cart'] = []
-        return redirect('/menu')
+        return redirect('/')
 
     return render_template('login.html', logged_in=is_logged_in())
+
+
+@app.route('/logout')
+def render_logout_page():
+    print(list(session.keys()))
+    [session.pop(key) for key in list(session.keys())]
+    print(list(session.keys()))
+    return redirect('/?messsage=See=you+next+time')
+
+
+@app.route('/categories')
+def render_categories():
+    return render_template('categories.html', logged_in=is_logged_in())
 
 
 app.run(host='0.0.0.0', debug=True)
