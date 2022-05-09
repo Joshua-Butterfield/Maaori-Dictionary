@@ -1,10 +1,29 @@
 {% extends 'base.html' %}
 
-{% block pageheading %}ASDASDASDASDASDASDASD{% endblock %}
+{% block pageheading %}{% endblock %}
 
 {% block main %}
-<p>Welcome to Joshua Butterfield's Māori Dictionary LESSSHHHH GO</p>
+<h2> {{ category_selected }}</h2>
 
-
+<table class="table">
+    <thead>
+        <tr>
+            <td><strong>Māori</strong></td>
+            <td><strong>English</strong></td>
+            <td><strong>Image</strong></td>
+        </tr>
+    </thead>
+    <tbody>
+    {% for dict_data in dict_list %}
+        <tr>
+            <td><a href="/word">{{dict_data[1]}}</a></td>
+            <td>{{dict_data[2]}}</td>
+            <td><img src="/static/images/{{ dict_data[5] }}"></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 
 {% endblock %}
+
+Pass the variable through for the category i've clicked

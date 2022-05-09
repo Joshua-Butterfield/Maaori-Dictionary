@@ -43,8 +43,12 @@ a {
 }
 
 img {
-    width: 100%;
+  border: 1px solid #ddd; /* Gray border */
+  border-radius: 4px;  /* Rounded border */
+  padding: 5px; /* Some padding */
+  width: 150px; /* Set a small width */
 }
+
 .dataForm {
     margin: 1rem 0;
     border: 1px solid #999;

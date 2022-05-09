@@ -4,7 +4,7 @@ from sqlite3 import Error
 from flask_bcrypt import Bcrypt
 from datetime import datetime
 
-#DATABASE = "C:/Users/18016/OneDrive - Wellington College/Maori Dictionary/dictionary.db"
+# DATABASE = "C:/Users/18016/OneDrive - Wellington College/Maori Dictionary/dictionary.db"
 DATABASE = r"C:/Users/Joshua Butterfield/OneDrive - Wellington College/Maori Dictionary/dictionary.db"
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -38,23 +38,27 @@ def is_logged_in():
         return True
 
 
-@app.route('/', methods=['Get', 'Post'])
+def category_selected():
+    """
+    A function to return what category the user has chosen
+    """
+    # session.get("cat_name")
+    # print(cat_name)
+    print("hello")
+
+
+@app.route('/')
 def render_homepage():
-    # Section to add categories
     if request.method == 'POST':
         cat_name = request.form.get('cat_name').strip().lower()
         con = create_connection(DATABASE)
+        print("hello")
         query = "INSERT INTO categories(cat_name) VALUES(?)"
         cur = con.cursor()
-        #try:
-        cur.execute(query, (cat_name,))
-        #except sqlite3.ProgrammingError:
-            #return redirect('/signup')
+        cur.execute(query, (cat_name))
+        category = cur.fetchall()
         con.commit()
         con.close()
-        return redirect('/')
-
-    # Section to display categories
     if request.method == 'GET':
         query = "SELECT cat_name FROM categories"
         con = create_connection(DATABASE)
@@ -63,12 +67,12 @@ def render_homepage():
         category = cur.fetchall()
         con.commit()
         con.close()
-        
+
     if is_logged_in():
         fname = session['fname']
     else:
         fname = ""
-        
+
     return render_template('home.html', categories_list=category, logged_in=is_logged_in(), user_id=fname)
 
 
@@ -121,7 +125,7 @@ def render_login_page():
         con = create_connection(DATABASE)
         query = "SELECT id, first_name, password FROM enduser WHERE email=? "
         cur = con.cursor()
-        cur.execute(query, (email, ))
+        cur.execute(query, (email,))
         user_data = cur.fetchall()
         con.close()
 
@@ -154,32 +158,20 @@ def render_logout_page():
 
 
 @app.route('/categories')
-def categories():
-    category_selected = request.args.get('type')
-    print(category_selected)
+def render_categories():
     con = create_connection(DATABASE)
-    
-    query = "SELECT id, maori, english, description, level, image FROM dict_data WHERE category = '"+category_selected+"'"
-    print(query)
+    query = "SELECT cat_name FROM categories"
+    cur = con.cursor()
+    cur.execute(query)
+    # print(cat_name)
+
+    query = "SELECT id, maori, english, description, level, image from dict_data "
     cur = con.cursor()
     cur.execute(query)
     data_list = cur.fetchall()
-    print(data_list)
-    con.commit()
     con.close()
 
-    return render_template('categories.html', dict_list=data_list, logged_in=is_logged_in(), category_selected=category_selected)
+    return render_template('categories.html', dict_list=data_list, logged_in=is_logged_in())
 
-@app.route('/word')
-def render_word():
-    con = create_connection(DATABASE)
-    query = "SELECT id, maori, english, description, level, image FROM dict_data WHERE category = '" + category_selected + "'"
-    cur = con.cursor()
-    cur.execute(query)
-    word_info = cur.fetchall()
-    con.commit()
-    con.close()
-    
-    return render_template('word.html', word_info=word_info, logged_in=is_logged_in())
-    
+
 app.run(host='0.0.0.0', debug=True)
