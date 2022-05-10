@@ -38,31 +38,36 @@ def is_logged_in():
         return True
 
 
-@app.route('/', methods=['Get', 'Post'])
-def render_homepage():
-    # Section to add categories
-    if request.method == 'POST':
-        cat_name = request.form.get('cat_name').strip().lower()
-        con = create_connection(DATABASE)
-        query = "INSERT INTO categories(cat_name) VALUES(?)"
-        cur = con.cursor()
-        #try:
-        cur.execute(query, (cat_name,))
-        #except sqlite3.ProgrammingError:
-            #return redirect('/signup')
-        con.commit()
-        con.close()
-        return redirect('/')
-
-    # Section to display categories
+def get_categories():
+    """
+    A function to display the categories
+    """
     if request.method == 'GET':
         query = "SELECT cat_name FROM categories"
         con = create_connection(DATABASE)
         cur = con.cursor()
         cur.execute(query, ())
         category = cur.fetchall()
+        print(category)
         con.commit()
         con.close()
+        return category
+
+
+@app.route('/', methods=['Get', 'Post'])
+def render_homepage():
+    # Section to add categories
+    if request.method == 'POST':
+        cat_name = request.form.get('cat_name').strip()
+        con = create_connection(DATABASE)
+        query = "INSERT INTO categories(cat_name) VALUES(?)"
+        cur = con.cursor()
+        cur.execute(query, (cat_name,))
+        con.commit()
+        con.close()
+        return redirect('/')
+
+    category = get_categories()
         
     if is_logged_in():
         fname = session['fname']
@@ -74,6 +79,7 @@ def render_homepage():
 
 @app.route('/signup', methods=['Get', 'Post'])
 def render_signup():
+    category = get_categories()
     if request.method == 'POST':
         print(request.form)
         first_name = request.form.get('first_name').title().strip()
@@ -108,11 +114,12 @@ def render_signup():
     error = request.args.get('error')
     if error is None:
         error = ""
-    return render_template('signup.html', error=error, logged_in=is_logged_in())
+    return render_template('signup.html', error=error, logged_in=is_logged_in(), categories_list=category)
 
 
 @app.route('/login', methods=['Get', 'Post'])
 def render_login_page():
+    category = get_categories()
     if request.method == 'POST':
         print(request.form)
         email = request.form.get('email').lower().strip()
@@ -139,47 +146,77 @@ def render_login_page():
         session['email'] = email
         session['customer_id'] = user_id
         session['fname'] = first_name
-        session['cart'] = []
+
         return redirect('/')
 
-    return render_template('login.html', logged_in=is_logged_in())
+    return render_template('login.html', logged_in=is_logged_in(), categories_list=category)
 
 
 @app.route('/logout')
 def render_logout_page():
+    category = get_categories()
     print(list(session.keys()))
     [session.pop(key) for key in list(session.keys())]
     print(list(session.keys()))
     return redirect('/?messsage=See=you+next+time')
 
 
-@app.route('/categories')
+@app.route('/categories', methods=['Get', 'Post'])
 def categories():
-    category_selected = request.args.get('type')
-    print(category_selected)
+    #category = get_categories()
+    if request.method == 'POST':
+        con = create_connection(DATABASE)
+        added_maori = request.form.get('maori').strip().title()
+        added_english = request.form.get('english').strip().title()
+        added_description = request.form.get('description')
+        added_level = request.form.get('level').strip().title()
+        added_image = "noimage.png"
+        category_selected = request.args.get('type')
+        added_date_entry = datetime.now()
+
+        #if added level... <10
+
+        query = "INSERT INTO dict_data (maori, english, description, level, image, category, timestamp) VALUES(?, ?, ?, ?, ?, ?, ?)"
+        cur = con.cursor()
+        cur.execute(query, (added_maori, added_english, added_description, added_level, added_image, category_selected, added_date_entry))
+        con.commit()
+        con.close()
+
+    # Section to prevent NULL error
+    query = "SELECT cat_name FROM categories"
     con = create_connection(DATABASE)
-    
-    query = "SELECT id, maori, english, description, level, image FROM dict_data WHERE category = '"+category_selected+"'"
-    print(query)
     cur = con.cursor()
-    cur.execute(query)
-    data_list = cur.fetchall()
-    print(data_list)
+    cur.execute(query, ())
+    category = cur.fetchall()
     con.commit()
     con.close()
 
-    return render_template('categories.html', dict_list=data_list, logged_in=is_logged_in(), category_selected=category_selected)
+    con = create_connection(DATABASE)
+    category_selected = request.args.get('type')
+    query = "SELECT id, maori, english, description, level, image, timestamp FROM dict_data WHERE category = '"+category_selected+"'"
+    cur = con.cursor()
+    cur.execute(query)
+    data_list = cur.fetchall()
+    con.commit()
+    con.close()
+
+    return render_template('categories.html', dict_list=data_list, logged_in=is_logged_in(), category_selected=category_selected, categories_list=category)
+
 
 @app.route('/word')
 def render_word():
+    #category = get_categories()
+    word_selected = request.args.get('type')
     con = create_connection(DATABASE)
-    query = "SELECT id, maori, english, description, level, image FROM dict_data WHERE category = '" + category_selected + "'"
+
+    query = "SELECT id, english, description, level, image, timestamp FROM dict_data WHERE maori = '" + word_selected + "'"
     cur = con.cursor()
     cur.execute(query)
     word_info = cur.fetchall()
     con.commit()
     con.close()
     
-    return render_template('word.html', word_info=word_info, logged_in=is_logged_in())
-    
+    return render_template('word.html', word_selected=word_selected, word_info=word_info, logged_in=is_logged_in())
+
+
 app.run(host='0.0.0.0', debug=True)

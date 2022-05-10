@@ -29,7 +29,6 @@
                 <li><a href="\">Home</a></li>
 				{% for i in categories_list %}
 					<li><a href="{{ url_for('categories', type=i) }}">{{ i[0] }}</a></li>
-
 				{% endfor %}
 			</ul>
 		</nav>
