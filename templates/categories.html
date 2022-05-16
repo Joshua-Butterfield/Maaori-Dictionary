@@ -4,7 +4,9 @@
 
 {% block main %}
     <h2> {{ category_selected }}</h2>
-
+    {% if teacher %}
+    <h2><a href="{{ url_for ('render_delete_category', type=category_selected) }}">Delete Category</a></h2>
+    {% endif %}
     <table class="table">
         <thead>
             <tr>
@@ -23,6 +25,7 @@
         {% endfor %}
         </tbody>
     </table>
+    {% if teacher %}
     <form class="dataForm" method="post">
         <div class="form-group">
             <div class ="form-label"> Maori Word:</div>
@@ -44,6 +47,7 @@
             <input type="submit" value="Submit">
         </div>
     </form>
+    {% endif %}
 {% endblock %}
 
 

@@ -30,6 +30,9 @@
 				{% for i in categories_list %}
 					<li><a href="{{ url_for('categories', type=i) }}">{{ i[0] }}</a></li>
 				{% endfor %}
+				{% if teacher %}
+				<li><a href="/add_category">Add Category</a></li>
+				{% endif %}
 			</ul>
 		</nav>
 

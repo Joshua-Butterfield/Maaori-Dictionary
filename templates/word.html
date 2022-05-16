@@ -5,6 +5,9 @@
 {% block main %}
 {% for dict_data in word_info %}
 <h2>{{ word_selected }} ({{dict_data[1]}})</h2>
+{% if teacher %}
+    <h2><a href="{{ url_for ('render_delete_word', type=word_selected) }}">Delete Word</a></h2>
+{% endif %}
 
 <table class="table">
     <thead>
@@ -12,7 +15,7 @@
             <td><strong>Definiton</strong></td>
             <td><strong>Level</strong></td>
             <td><strong>Date Added</strong></td>
-            <td><strong>Edited By</strong></td>
+            <td><strong>Added By</strong></td>
         </tr>
     </thead>
     <tbody>
@@ -20,7 +23,7 @@
             <td>{{dict_data[2]}}</td>
             <td>{{dict_data[3]}}</td>
             <td>{{dict_data[5]}}</td>
-            <td>Working on it</td>
+            <td>{{ dict_data[6] }}</td>
             <img src="/static/images/{{ dict_data[4] }}">
         </tr>
     </tbody>

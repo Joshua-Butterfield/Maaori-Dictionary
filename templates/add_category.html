@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Māori Dictionary | Home{% endblock %}
+
+{% block heading %}Māori - English Dictionary{% endblock %}
+
+{% block main %}
+<form class="dataForm" method="post">
+    <div class="form-group">
+        <div class ="form-label">Category Name:</div>
+        <div class="form-element"><input type="text" id="cat_name" name="cat_name"></div>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Submit">
+    </div>
+    <p>If you don't have an account, please <a href="/signup">sign up</a></p>
+</form>
+{% endblock %}
