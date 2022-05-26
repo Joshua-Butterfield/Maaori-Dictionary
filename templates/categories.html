@@ -4,6 +4,7 @@
 
 {% block main %}
     <h2> {{ category_selected }}</h2>
+    <h3> {{ cat_descs[0][0] }}</h3>
     {% if teacher %}
     <h2><a href="{{ url_for ('render_delete_category', type=category_selected) }}">Delete Category</a></h2>
     {% endif %}

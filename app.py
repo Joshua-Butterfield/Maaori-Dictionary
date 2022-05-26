@@ -83,14 +83,17 @@ def render_homepage():
 # Section to add categories
 @app.route('/add_category', methods=["GET", "POST"])
 def render_add_category():
+    if not is_logged_in() and not is_teacher():
+        return redirect('/')
     category = get_categories()  # displaying categories
     if request.method == 'POST':
         cat_name = request.form.get('cat_name').strip().title()
+        cat_desc = request.form.get('cat_desc')
         con = create_connection(DATABASE)
-        query = "INSERT INTO categories(cat_name) VALUES(?)"
+        query = "INSERT INTO categories(cat_name, cat_desc) VALUES(?, ?)"
         cur = con.cursor()
         try:
-            cur.execute(query, (cat_name,))
+            cur.execute(query, (cat_name, cat_desc))
         except sqlite3.IntegrityError:
             return redirect('/?category+aready+exists')
         con.commit()
@@ -99,29 +102,6 @@ def render_add_category():
 
     return render_template('add_category.html', logged_in=is_logged_in(), categories_list=category,
                            teacher=is_teacher())
-
-
-# Section to delete categories
-@app.route('/delete_category', methods=["GET", "POST"])
-def render_delete_category():
-    if request.method == 'GET':
-        category_selected = request.args.get('type')  # grabs the category clicked
-        if type:
-            if category_selected is None:  # prevent NULL error
-                print("NULL")
-            else:
-                # query to delete from categories database
-                query = "DELETE FROM categories WHERE cat_name = '" + category_selected + "'"
-                con = create_connection(DATABASE)
-                cur = con.cursor()
-                cur.execute(query)
-                # query to delete all the data (e.g. words) for that category from dict_data database
-                query = "DELETE FROM dict_data WHERE cat_name = '" + category_selected + "'"
-                cur = con.cursor()
-                cur.execute(query)
-                con.commit()
-                con.close()
-    return redirect('/')
 
 
 # Section for user signup
@@ -226,7 +206,7 @@ def categories():
         added_date_entry = datetime.now()
         first_name = session['first_name']
         added_user = first_name
-
+        
         # Section for checking the level entered is valid
         level = request.form.get('level')
         try:
@@ -268,7 +248,15 @@ def categories():
     con.commit()
     con.close()
 
-    return render_template('categories.html', dict_list=data_list, logged_in=is_logged_in(),
+    query = "SELECT cat_desc from categories where cat_name ='" + category_selected + "'"
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query)
+    cat_descs = cur.fetchall()
+    con.commit()
+    con.close()
+
+    return render_template('categories.html', dict_list=data_list, logged_in=is_logged_in(), cat_descs=cat_descs,
                            category_selected=category_selected, categories_list=category, teacher=is_teacher())
 
 
@@ -293,6 +281,8 @@ def render_word():
 # Section to delete word
 @app.route('/delete_word', methods=["GET", "POST"])
 def render_delete_word():
+    if not is_logged_in() and not is_teacher():
+        return redirect('/')
     if request.method == 'GET':
         word_selected = request.args.get('type')  # grabs the word clicked
         if type:
@@ -300,6 +290,24 @@ def render_delete_word():
                 print("NULL")
             else:
                 query = "DELETE FROM dict_data WHERE maori = '" + word_selected + "'"
+                con = create_connection(DATABASE)
+                cur = con.cursor()
+                cur.execute(query)
+                con.commit()
+                con.close()
+    return redirect('/')
+
+
+# Section to delete categories
+@app.route('/delete_category', methods=["GET", "POST"])
+def render_delete_category():
+    if request.method == 'GET':
+        category_selected = request.args.get('type')  # grabs the category clicked
+        if type:
+            if category_selected is None:  # prevent NULL error
+                print("NULL")
+            else:
+                query = "DELETE FROM categories WHERE cat_name = '" + category_selected + "'"
                 con = create_connection(DATABASE)
                 cur = con.cursor()
                 cur.execute(query)
