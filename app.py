@@ -6,7 +6,7 @@ from datetime import datetime
 
 # Databases for at school and home
 DATABASE = "C:/Users/18016/OneDrive - Wellington College/Maori Dictionary/dictionary.db"
-#DATABASE = r"C:/Users/Joshua Butterfield/OneDrive - Wellington College/Maori Dictionary/dictionary.db"
+# DATABASE = r"C:/Users/Joshua Butterfield/OneDrive - Wellington College/Maori Dictionary/dictionary.db"
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "banana"
