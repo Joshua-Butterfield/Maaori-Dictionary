@@ -2,10 +2,10 @@
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
     <data-source source="LOCAL" name="dictionary [2]" uuid="718c9cb6-4630-4ca3-bd63-7f4baad13e94">
-      <driver-ref>4b08ef34-51c1-404f-930b-d897b5302f88</driver-ref>
+      <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:C:\Users\18016\OneDrive - Wellington College\Maori Dictionary\dictionary.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:C:\Users\Joshua Butterfield\OneDrive - Wellington College\Maori Dictionary\dictionary.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
       <libraries>
         <library>

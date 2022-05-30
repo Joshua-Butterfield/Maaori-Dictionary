@@ -5,8 +5,8 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime
 
 # Databases for at school and home
-DATABASE = "C:/Users/18016/OneDrive - Wellington College/Maori Dictionary/dictionary.db"
-# DATABASE = r"C:/Users/Joshua Butterfield/OneDrive - Wellington College/Maori Dictionary/dictionary.db"
+# DATABASE = "C:/Users/18016/OneDrive - Wellington College/Maori Dictionary/dictionary.db"
+DATABASE = r"C:/Users/Joshua Butterfield/OneDrive - Wellington College/Maori Dictionary/dictionary.db"
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "banana"
@@ -95,7 +95,7 @@ def render_add_category():
         try:
             cur.execute(query, (cat_name, cat_desc))
         except sqlite3.IntegrityError:
-            return redirect('/?category+aready+exists')
+            return redirect('/?category+already+exists')
         con.commit()
         con.close()
         return redirect('/')
